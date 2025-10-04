@@ -12,22 +12,16 @@ const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
 app.use(express.json());
 
-// Determine if running locally or serverless
-const isServerless = process.env.VERCEL || process.env.FUNCTION_NAME;
-
-// Local: Connect once on startup
-if (!isServerless) {
+// Local: Connect once
+if (!process.env.VERCEL) {
   mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  }).then(() => {
-    console.log('MongoDB connected locally');
-  }).catch(err => {
-    console.error('MongoDB connection error:', err);
-  });
+  }).then(() => console.log('MongoDB connected locally'))
+    .catch(err => console.error('MongoDB connection error:', err));
 }
 
-// Serverless: Connect per request
+// Serverless: Per-request connection
 app.use(async (req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
     try {
@@ -52,12 +46,10 @@ app.get('/', (req, res) => {
   res.send('Survey Viz Platform Backend');
 });
 
-// Local: Start server
-if (!isServerless) {
+// Local server
+if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
-module.exports = app; // Export for Vercel Functions
+module.exports = app;
