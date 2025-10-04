@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const XLSX = require('xlsx');
 const jwt = require('jsonwebtoken');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() }); // Memory storage for serverless
 
 // Middleware to verify JWT
 const authMiddleware = (req, res, next) => {
@@ -21,10 +21,10 @@ const authMiddleware = (req, res, next) => {
 // Upload endpoint
 router.post('/', authMiddleware, upload.single('file'), (req, res) => {
   try {
-    const workbook = XLSX.readFile(req.file.path);
+    // Process from memory buffer (no file save)
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-    // Optionally save data to MongoDB under user's ID (req.userId)
     res.json({ data });
   } catch (err) {
     console.error('Upload error:', err);
