@@ -1,104 +1,71 @@
-import React, { useState, useContext } from 'react';
-import { TextField, Button, Typography, Paper, Box, Avatar } from '@mui/material';
-import { AuthContext } from '../../context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+// Register.js
+import React, { useState } from 'react';
 import axios from 'axios';
-import HowToRegIcon from '@mui/icons-material/HowToReg';
 
 const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [message, setMessage] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await axios.post('${process.env.REACT_APP_BACKEND_URL}/api/auth/register', { email, password });
-      await login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      console.error('Registration error:', err);
-      alert('Registration failed. Email may already be in use.');
+      // Use the environment variable for backend API
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/auth/register`,
+        formData
+      );
+      setMessage('Registration successful!');
+      console.log('Registration response:', res.data);
+    } catch (error) {
+      setMessage('Registration failed!');
+      console.error('Registration error:', error);
     }
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#FFFFFF',
-        padding: '2rem',
-      }}
-    >
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          borderRadius: '12px',
-          width: '100%',
-          maxWidth: 400,
-          textAlign: 'center',
-          backgroundColor: '#FFF',
-          boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-        }}
-      >
-        <Avatar
-          sx={{
-            bgcolor: '#2196F3',
-            width: 70,
-            height: 70,
-            margin: '0 auto 1.5rem',
-          }}
-        >
-          <HowToRegIcon sx={{ fontSize: 40, color: '#FFF' }} />
-        </Avatar>
-        <Typography variant="h4" gutterBottom fontWeight="bold" color="#2C3E50">
-          Sign Up
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom color="#666">
-          Create your survey account
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            InputProps={{ style: { borderRadius: '8px' } }}
-            InputLabelProps={{ style: { color: '#666' } }}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            InputProps={{ style: { borderRadius: '8px' } }}
-            InputLabelProps={{ style: { color: '#666' } }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2, py: 1.5, borderRadius: '8px', backgroundColor: '#2196F3', '&:hover': { backgroundColor: '#1976D2' } }}
-          >
-            Register
-          </Button>
-        </form>
-        <Typography variant="body2" sx={{ mt: 2, color: '#666' }}>
-          Already have an account? <Link to="/login" style={{ color: '#2196F3', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>Login</Link>
-        </Typography>
-      </Paper>
-    </Box>
+    <div>
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={formData.username}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">Register</button>
+      </form>
+      <p>{message}</p>
+    </div>
   );
 };
 
