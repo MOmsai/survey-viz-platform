@@ -9,7 +9,15 @@ const analyzeRoutes = require('./routes/analyze');
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3000' }));
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://survey-viz-platform.vercel.app'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 app.use(express.json());
 
 // Local: Connect once
