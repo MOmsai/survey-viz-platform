@@ -13,6 +13,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://survey-viz-platform.vercel.app'
 ];
+const cors = require('cors');
+app.use(cors({ origin: 'https://survey-viz-platform.vercel.app/' }));
 
 app.use(cors({
   origin: allowedOrigins,
