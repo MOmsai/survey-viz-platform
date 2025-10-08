@@ -14,8 +14,8 @@ export const AuthProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      setUser(data.user); // Adjust based on your backend response
-      localStorage.setItem('token', data.token); // Store token if used
+      setUser(data.user);
+      localStorage.setItem('token', data.token);
     } catch (error) {
       console.error('Login error:', error.message);
       throw error;
