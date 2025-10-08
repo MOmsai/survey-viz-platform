@@ -14,7 +14,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'https://survey-viz-platform.vercel.app',
-  'https://survey-viz-platform-pnwj.vercel.app' // Add preview URL if used
+  'https://survey-viz-platform-pnwj.vercel.app'
 ];
 
 // Configure CORS with dynamic origin
@@ -44,27 +44,20 @@ const connectDB = async () => {
       console.log('MongoDB connected');
     } catch (err) {
       console.error('MongoDB connection error:', err);
-      throw err; // Let the server handle the error
+      throw err;
     }
   }
 };
 
-// Local development server
-if (process.env.NODE_ENV !== 'production') {
-  connectDB().catch(err => console.error('Failed to connect on startup:', err));
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-} else {
-  // Serverless environment (e.g., Render, Vercel)
-  app.use(async (req, res, next) => {
-    try {
-      await connectDB();
-      next();
-    } catch (err) {
-      res.status(500).json({ error: 'Database connection failed' });
-    }
-  });
-}
+// Middleware to ensure DB connection for all requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
@@ -74,4 +67,8 @@ app.get('/', (req, res) => {
   res.send('Survey Viz Platform Backend');
 });
 
-module.exports = app;
+// Start server in all environments (local or Render)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app; // For potential serverless compatibility (though not needed with listener)
