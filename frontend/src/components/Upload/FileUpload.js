@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Container, Typography } from '@mui/material'; // Removed unused Button
+import { Container, Typography } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const FileUpload = ({ onDataLoaded }) => {
-  const [file, setFile] = useState(null); // Used in state, no warning
+  const [file, setFile] = useState(null); // Now used for display
   const navigate = useNavigate();
 
   const handleUpload = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-    setFile(selectedFile); // Sets state, used for potential UI feedback
+    setFile(selectedFile); // Update state
     const formData = new FormData();
     formData.append('file', selectedFile);
     const token = localStorage.getItem('token');
@@ -19,7 +19,6 @@ const FileUpload = ({ onDataLoaded }) => {
       navigate('/login');
       return;
     }
-
     try {
       const res = await axios.post(process.env.REACT_APP_API_URL || 'http://localhost:5000/api/upload', formData, {
         headers: { 
@@ -45,6 +44,7 @@ const FileUpload = ({ onDataLoaded }) => {
     <Container>
       <Typography variant="h6" gutterBottom>Upload Excel File</Typography>
       <input type="file" accept=".xlsx, .xls" onChange={handleUpload} />
+      {file && <Typography variant="body2">Selected file: {file.name}</Typography>}
     </Container>
   );
 };
