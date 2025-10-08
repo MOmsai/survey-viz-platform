@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography } from '@mui/material';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext'; // Adjusted path
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,10 +19,10 @@ const Login = () => {
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      login(data.token); // Assuming login sets a token
+      login(data.token);
       navigate('/dashboard');
     } catch (error) {
-      console.error('Login error:', error.message); // Full error
+      console.error('Login error:', error.message);
       alert(`Login failed: ${error.message}`);
     }
   };
@@ -31,24 +31,9 @@ const Login = () => {
     <Container maxWidth="xs">
       <Typography variant="h4" gutterBottom>Login</Typography>
       <form onSubmit={onSubmit}>
-        <TextField
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Login
-        </Button>
+        <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth margin="normal" />
+        <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth margin="normal" />
+        <Button type="submit" variant="contained" color="primary" fullWidth>Login</Button>
       </form>
     </Container>
   );
