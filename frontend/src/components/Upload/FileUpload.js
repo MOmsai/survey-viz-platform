@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Container, Typography } from '@mui/material';
+import { Container, Typography } from '@mui/material'; // Removed unused Button
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const FileUpload = ({ onDataLoaded }) => {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null); // Used in state, no warning
   const navigate = useNavigate();
 
   const handleUpload = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-    setFile(selectedFile);
+    setFile(selectedFile); // Sets state, used for potential UI feedback
     const formData = new FormData();
     formData.append('file', selectedFile);
     const token = localStorage.getItem('token');
@@ -19,11 +19,12 @@ const FileUpload = ({ onDataLoaded }) => {
       navigate('/login');
       return;
     }
+
     try {
-      const res = await axios.post('http://localhost:5000/api/upload', formData, {
+      const res = await axios.post(process.env.REACT_APP_API_URL || 'http://localhost:5000/api/upload', formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
         },
       });
       onDataLoaded(res.data.data);
