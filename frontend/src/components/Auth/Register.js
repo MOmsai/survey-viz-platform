@@ -1,71 +1,40 @@
-// Register.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Container, Typography } from '@mui/material';
+import { AuthContext } from '../../context/AuthContext'; // Adjusted path
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
-  });
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
-      // Use the environment variable for backend API
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/register`,
-        formData
-      );
-      setMessage('Registration successful!');
-      console.log('Registration response:', res.data);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      alert('Registration successful!');
+      navigate('/login');
     } catch (error) {
-      setMessage('Registration failed!');
-      console.error('Registration error:', error);
+      console.error('Registration error:', error.message);
+      alert(`Registration failed: ${error.message}`);
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Register</button>
+    <Container maxWidth="xs">
+      <Typography variant="h4" gutterBottom>Register</Typography>
+      <form onSubmit={handleRegister}>
+        <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth margin="normal" />
+        <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth margin="normal" />
+        <Button type="submit" variant="contained" color="primary" fullWidth>Register</Button>
       </form>
-      <p>{message}</p>
-    </div>
+    </Container>
   );
 };
 
