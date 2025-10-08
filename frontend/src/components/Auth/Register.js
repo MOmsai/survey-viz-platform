@@ -23,7 +23,7 @@ const Register = () => {
     try {
       // Use the environment variable for backend API
       const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth/register`,
+        `${process.env.REACT_APP_API_URL}/api/auth/register`,
         formData
       );
       setMessage('Registration successful!');
