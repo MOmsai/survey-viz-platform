@@ -18,7 +18,7 @@ const Register = () => {
     try {
       await axios.post(`${API_URL}/api/auth/register`, { email, password });
       await login(email, password);
-      navigate('/dashboard');
+      navigate('/login');
     } catch (err) {
       console.error('Registration error:', err);
       alert('Registration failed. Email may already be in use.');
