@@ -3,7 +3,7 @@ import { Container, Typography } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://survey-viz-platform-backend.onrender.com';
+const API_URL = process.env.REACT_APP_API_URL || 'https://survey-viz-platform.vercel.app';
 
 const FileUpload = ({ onDataLoaded }) => {
   const [file, setFile] = useState(null);
