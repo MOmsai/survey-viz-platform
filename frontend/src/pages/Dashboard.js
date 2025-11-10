@@ -117,7 +117,7 @@ const handleAIQuery = async () => {
       return;
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
     const dataToSend = filteredData; // Use full data for this small dataset
 
     // Precompute sum of Age for validation
