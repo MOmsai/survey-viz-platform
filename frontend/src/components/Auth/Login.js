@@ -4,6 +4,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 
+//const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -93,7 +95,7 @@ const Login = () => {
           </Button>
         </form>
         <Typography variant="body2" sx={{ mt: 2, color: '#666' }}>
-          Don’t have an account? <Link to="/register" style={{ color: '#4CAF50', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>Sign up</Link>
+          Don’t have an account? <Link to="/register" style={{ color: '#4CAF50', textDecoration: 'none' }}>Sign up</Link>
         </Typography>
       </Paper>
     </Box>

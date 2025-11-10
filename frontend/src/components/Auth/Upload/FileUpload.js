@@ -1,36 +1,53 @@
-import React, { useState } from 'react';
-import { Button } from '@mui/material';
-import * as XLSX from 'xlsx';
+import React from 'react';
+import { Container, Typography } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const FileUpload = ({ onDataLoaded }) => {
-  const [file, setFile] = useState(null);
+  const navigate = useNavigate();
 
   const handleUpload = async (e) => {
     const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    const reader = new FileReader();
-    reader.onload = async (evt) => {
-      const bstr = evt.target.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      onDataLoaded(data);
-      // Optionally send to backend
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      await axios.post('http://localhost:5000/api/upload', formData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to upload files');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${API_URL}/api/upload`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        },
       });
-    };
-    reader.readAsBinaryString(selectedFile);
+      onDataLoaded(res.data.data);
+      alert('File uploaded successfully');
+    } catch (err) {
+      console.error('Upload error:', err);
+      if (err.response?.status === 401) {
+        alert('Session expired. Please log in again.');
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        alert('File upload failed');
+      }
+    }
   };
 
   return (
-    <div>
+    <Container>
+      <Typography variant="h6" gutterBottom>Upload Excel File</Typography>
       <input type="file" accept=".xlsx, .xls" onChange={handleUpload} />
-    </div>
+    </Container>
   );
 };
 

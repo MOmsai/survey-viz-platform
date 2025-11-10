@@ -5,6 +5,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +16,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', { email, password });
+      await axios.post(`${API_URL}/api/auth/register`, { email, password });
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
@@ -95,7 +97,7 @@ const Register = () => {
           </Button>
         </form>
         <Typography variant="body2" sx={{ mt: 2, color: '#666' }}>
-          Already have an account? <Link to="/login" style={{ color: '#2196F3', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>Login</Link>
+          Already have an account? <Link to="/login" style={{ color: '#2196F3', textDecoration: 'none' }}>Login</Link>
         </Typography>
       </Paper>
     </Box>
