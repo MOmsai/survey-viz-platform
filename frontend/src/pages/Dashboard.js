@@ -112,35 +112,100 @@ const handleAIQuery = async () => {
   setIsAIAnalyzing(true);
   try {
     const filteredData = getFilteredData();
-    if (filteredData.length === 0) {
-      alert('No data available for analysis. Please upload data and apply filters.');
-      return;
+    
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash-lite",
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      }
+    });
+    
+    let prompt = '';
+    
+    // Check if data is available and if the question might be data-related
+    if (filteredData.length > 0) {
+      const columns = Object.keys(filteredData[0] || {});
+      
+      // Provide complete dataset for accurate analysis
+      const completeData = filteredData;
+      
+      prompt = `You are a highly capable AI assistant with expertise in data analysis, statistics, and general knowledge. You can answer ANY type of question the user asks.
+
+**User Question:** "${aiQuery}"
+
+**Context:** The user has uploaded survey/data with the following information:
+- Total rows: ${completeData.length}
+- Columns: ${columns.join(', ')}
+
+**Complete Dataset:**
+${JSON.stringify(completeData, null, 2)}
+
+**Your Capabilities:**
+1. **Data-Related Questions:** If the question is about the data above, perform in-depth analysis including:
+   - Accurate calculations (sums, averages, medians, percentiles, correlations, etc.)
+   - Statistical insights and trends
+   - Pattern recognition and anomaly detection
+   - Comparisons and segmentation analysis
+   - Predictive insights based on the data
+   - Data quality observations
+
+2. **General Knowledge Questions:** If the question is NOT about the data (e.g., "What is the capital of France?", "Explain quantum physics", "Write a poem"), answer it using your general knowledge and capabilities:
+   - Provide comprehensive, accurate information
+   - Use examples and explanations as needed
+   - Be creative for open-ended questions
+   - Offer detailed insights and context
+
+3. **Mixed Questions:** If the question combines data analysis with general knowledge (e.g., "Compare this survey data to industry standards"), use both the data and your general knowledge.
+
+**Instructions:**
+- Answer ANY question the user asks, whether it's about the data or not
+- For data questions: Use the COMPLETE dataset provided above for accurate analysis
+- For non-data questions: Use your full knowledge and reasoning capabilities
+- Provide in-depth, detailed responses
+- Be conversational and helpful
+- If you need to make assumptions, state them clearly
+- Show your work for calculations
+
+Now, please answer the user's question thoroughly.`;
+    } else {
+      // No data available, answer as a general-purpose AI
+      prompt = `You are a highly capable AI assistant. The user has asked you a question, but they haven't uploaded any data yet (or the data is empty).
+
+**User Question:** "${aiQuery}"
+
+**Instructions:**
+- Answer the question using your general knowledge and capabilities
+- Provide comprehensive, accurate, and helpful information
+- Be conversational and engaging
+- If the question seems like it would benefit from data analysis, politely mention that the user can upload data for you to analyze
+- Otherwise, provide a complete answer based on your knowledge
+
+Please answer the user's question now.`;
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
-    const dataToSend = filteredData; // Use full data for this small dataset
-
-    // Precompute sum of Age for validation
-    const ageSum = filteredData.reduce((sum, row) => sum + (Number(row.Age) || 0), 0);
-
-    const prompt = `Analyze this survey data and answer the question: "${aiQuery}". Use only the provided data.
-
-Data details:
-- Columns: ${Object.keys(filteredData[0] || {}).join(', ')}
-- Data rows (all available): ${JSON.stringify(dataToSend, null, 2)}
-
-Instructions:
-- If the query involves calculating a sum (e.g., sum of Age), compute it accurately from the 'Age' column.
-- Provide the exact numerical result and avoid approximations unless specified.
-- Return the result in this format: "The sum of Age is [value]." for sum queries, or provide relevant insights for other queries.
-
-Validation: The precomputed sum of Age is ${ageSum} for reference.`;
-
     const result = await model.generateContent(prompt);
-    setAiResponse(result.response.text());
+    const response = result.response.text();
+    setAiResponse(response);
   } catch (err) {
     console.error('AI Analysis error:', err);
-    alert(`AI analysis failed. Details: ${err.message}. Try reducing dataset size or checking limits.`);
+    
+    // Provide more helpful error messages
+    let errorMessage = 'AI analysis failed. ';
+    if (err.message.includes('quota') || err.message.includes('rate limit')) {
+      errorMessage += 'API rate limit reached. Please try again in a moment.';
+    } else if (err.message.includes('API key')) {
+      errorMessage += 'Invalid API key. Please check your Gemini API key configuration.';
+    } else if (err.message.includes('timeout')) {
+      errorMessage += 'Request timed out. Please try with a simpler question or smaller dataset.';
+    } else {
+      errorMessage += `Error: ${err.message}`;
+    }
+    
+    alert(errorMessage);
+    setAiResponse('');
   } finally {
     setIsAIAnalyzing(false);
   }
