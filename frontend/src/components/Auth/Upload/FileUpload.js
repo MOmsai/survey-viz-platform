@@ -3,8 +3,7 @@ import { Container, Typography } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// THIS LINE IS CRITICAL
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://survey-viz-platform-backend.onrender.com';
 
 const FileUpload = ({ onDataLoaded }) => {
   const [file, setFile] = useState(null);
@@ -23,7 +22,6 @@ const FileUpload = ({ onDataLoaded }) => {
       return;
     }
     try {
-      // USE API_URL HERE
       const res = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,

@@ -1,9 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-export const AuthContext = createContext();
+const API_URL = process.env.REACT_APP_API_URL || 'https://survey-viz-platform-backend.onrender.com';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

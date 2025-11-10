@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://survey-viz-platform-backend.onrender.com';
 
 const Register = () => {
   const [email, setEmail] = useState('');
